@@ -14,9 +14,7 @@
     "registry": "https://registry.npmjs.org"
   },
   "scripts": {
-    "install": "run-s install-base install-core",
-    "install-base": "yarn install --ignore-scripts",
-    "install-core": "(cd libs/core && yarn install --production)",
+    "preinstall": "(cd libs/core && case $npm_config_user_agent in yarn*) yarn install --prefer-offline ;; *) npm install --prefer-offline ;; esac)",
     "prepare": "husky",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
@@ -25,6 +23,7 @@
     "format": "biome format --write ./src",
     "verify": "run-s lint build",
     "dev": "next dev",
+    "prebuild": "(cd libs/core && npm run build)",
     "build": "next build",
     "start": "next start"
   },
