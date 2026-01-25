@@ -177,13 +177,11 @@ export default function RepositoryTable({ actors }: { actors: ActorInfo[] }) {
                 </div>
               </TableCell>
               <TableCell>
-                {Object.entries(countBy(item.events, 'type'))
-                  .map(([event, count]) => `${event}: ${count}`)
-                  .map(([event, count]) => (
-                    <div key={event} className="text-xs">
-                      {event}: {count}
-                    </div>
-                  ))}
+                {Object.entries(countBy(item.events, 'type')).map(([event, count]) => (
+                  <div key={event} className="text-xs">
+                    {event}: {count}
+                  </div>
+                ))}
               </TableCell>
               <TableCell>{IntlNumberFormat(user.followers_count)}</TableCell>
               <TableCell>{IntlNumberFormat(user.following_count)}</TableCell>
