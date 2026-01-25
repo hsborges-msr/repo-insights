@@ -2,11 +2,11 @@ import { Avatar, AvatarGroup, Link, Tooltip } from '@heroui/react';
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 import orderBy from 'lodash-es/orderBy';
-import numeral from 'numeral';
 import { useMemo } from 'react';
 import { DATE_FORMATS } from '@/constants';
 import { User } from '@/core';
 import { ActorInfo } from '@/entities/ActorInfo';
+import IntlNumberFormat from '@/helpers/intl/number';
 
 dayjs.extend(localizedFormat);
 
@@ -30,7 +30,7 @@ function Highlights(data: {
           isBordered
           max={5}
           renderCount={(count) => (
-            <p className="text-small text-foreground font-medium ms-2">+{numeral(count).format('0,0')}</p>
+            <p className="text-small text-foreground font-medium ms-2">+{IntlNumberFormat(count)}</p>
           )}
         >
           {data.actors.map((actor) => {
@@ -90,7 +90,7 @@ export default function RepositoryHighlights({ actors }: { actors: ActorInfo[] }
       <Highlights
         title="Most followers"
         actors={orderBy(actors, 'followers_count', 'desc').slice(0, 5)}
-        description={(actor) => `${numeral((actor as User).followers_count).format('0,0')} followers`}
+        description={(actor) => `${IntlNumberFormat((actor as User).followers_count)} followers`}
       />
       {sorted.some((s) => (s as User).is_github_star) && (
         <Highlights

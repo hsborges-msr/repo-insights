@@ -11,10 +11,10 @@ import {
   IconStarFilled,
   IconTagFilled
 } from '@tabler/icons-react';
-import numeral from 'numeral';
 import { useMemo } from 'react';
 import { twMerge } from 'tailwind-merge';
 import { Repository, User } from '@/core';
+import IntlNumberFormat from '@/helpers/intl/number';
 
 /**
  * Repository header showing repo owner, name and quick stats.
@@ -72,7 +72,7 @@ export function RepositoryHeader({ repo, className }: { repo: Repository; classN
                 <span className="flex justify-center items-center gap-1 text-gray-500">
                   <Icon size="1em" /> {label}:
                 </span>
-                <span className="font-medium">{numeral(value).format('0,0')}</span>
+                <span className="font-medium">{IntlNumberFormat(value)}</span>
               </span>
             )
         )}

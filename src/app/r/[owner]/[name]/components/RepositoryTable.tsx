@@ -21,13 +21,12 @@ import relativeFormat from 'dayjs/plugin/relativeTime';
 import countBy from 'lodash-es/countBy';
 import orderBy from 'lodash-es/orderBy';
 import Link from 'next/link';
-import numeral from 'numeral';
 import { useMemo, useState } from 'react';
 import { useBoolean } from 'react-use';
-
 import { DATE_FORMATS, PAGINATION } from '@/constants';
 import { Actor, User } from '@/core';
 import { ActorInfo } from '@/entities/ActorInfo';
+import IntlNumberFormat from '@/helpers/intl/number';
 import { SocialPlatforms } from '@/helpers/social';
 
 dayjs.extend(localizedFormat);
@@ -79,7 +78,7 @@ export default function RepositoryTable({ actors }: { actors: ActorInfo[] }) {
         <div className="flex max-sm:flex-col-reverse max-sm:gap-4 w-full justify-between max-sm:justify-center px-4 items-center">
           <div className="flex items-center gap-2 text-sm text-gray-500">
             <div>
-              <strong>Total:</strong> {numeral(actors.length).format('0,0')}
+              <strong>Total:</strong> {IntlNumberFormat(actors.length)}
             </div>
             <Divider orientation="vertical" className="h-4" />
             <Checkbox
@@ -185,8 +184,8 @@ export default function RepositoryTable({ actors }: { actors: ActorInfo[] }) {
                     </div>
                   ))}
               </TableCell>
-              <TableCell>{numeral(user.followers_count).format('0,0')}</TableCell>
-              <TableCell>{numeral(user.following_count).format('0,0')}</TableCell>
+              <TableCell>{IntlNumberFormat(user.followers_count)}</TableCell>
+              <TableCell>{IntlNumberFormat(user.following_count)}</TableCell>
               <TableCell>
                 <abbr title={`Created at ${dayjs(user.created_at).format(DATE_FORMATS.LONG)}`}>
                   {dayjs(user.created_at).fromNow(true)}

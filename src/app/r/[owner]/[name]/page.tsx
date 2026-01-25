@@ -2,18 +2,17 @@
 
 import { Alert, Button, Skeleton, Spinner } from '@heroui/react';
 import { IconPlayerPauseFilled, IconPlayerPlayFilled } from '@tabler/icons-react';
-import flatten from 'lodash-es/flatten';
-import groupBy from 'lodash-es/groupBy';
 import mapValues from 'lodash-es/mapValues';
 import orderBy from 'lodash-es/orderBy';
 import { useParams } from 'next/navigation';
-import numeral from 'numeral';
 import { useEffect, useMemo } from 'react';
 import { useBoolean } from 'react-use';
 import { Actor, Reaction, User } from '@/core';
 import { ActorInfo } from '@/entities/ActorInfo';
+import IntlNumberFormat from '@/helpers/intl/number';
 import useAuth from '@/hooks/useAuth';
 import useRepository from '@/hooks/useRepository';
+import { useRepositoryData } from '@/hooks/useRepositoryData';
 import useResources from '@/hooks/useResources';
 import Loading from './components/Loading';
 import { PageSection } from './components/PageSection';
@@ -41,40 +40,7 @@ export default function Repository() {
 
   useEffect(() => setPaused(false), [setPaused]);
 
-  const users = useMemo<ActorInfo[]>(() => {
-    const starred: ActorInfo[] = (stars.value || []).map((s) => ({
-      ...(s.user as User),
-      events: [{ type: 'starred', date: s.starred_at }]
-    }));
-
-    const watched: ActorInfo[] = (watchers.value || []).map((s) => ({
-      ...(s.user as User),
-      events: [{ type: 'watching', date: new Date(0) }]
-    }));
-
-    const released = (releases.value || [])
-      .map((r) => (r.author ? { ...r.author, events: [{ type: 'release', date: r.created_at }] } : null))
-      .filter((a) => a !== null) as ActorInfo[];
-
-    const reacted = flatten(
-      (releases.value || []).map((r) => {
-        return ((r.reactions || []) as Reaction[])?.map(
-          (ra) =>
-            ({
-              ...(ra.user as Actor),
-              events: [{ type: 'reaction', date: ra.created_at }]
-            }) satisfies ActorInfo
-        );
-      })
-    );
-
-    const merged = Object.values(groupBy([...starred, ...released, ...watched, ...reacted], 'id')).map((rest) => ({
-      ...rest.at(0),
-      events: orderBy(flatten(rest.map((e) => e.events)), 'date', 'desc')
-    }));
-
-    return orderBy(merged, 'events.[0].date', 'desc') as ActorInfo[];
-  }, [stars.value, releases.value, watchers.value]);
+  const users = useRepositoryData(stars.value || [], releases.value || [], watchers.value || []);
 
   const progress = useMemo(
     () =>
@@ -84,7 +50,7 @@ export default function Repository() {
           releases: releases.hasMore ? (releases.value?.length || 0) / (repo.value?.releases_count || 0) : 1,
           watchers: watchers.hasMore ? (watchers.value?.length || 0) / (repo.value?.watchers_count || 0) : 1
         },
-        (v) => numeral(Math.min(1, v)).format('0.[00]%')
+        (v) => IntlNumberFormat(Math.min(1, v) * 100) + '%'
       ),
     [repo, stars, releases, watchers]
   );

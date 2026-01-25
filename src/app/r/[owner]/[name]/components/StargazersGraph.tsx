@@ -5,7 +5,10 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
 import utcTime from 'dayjs/plugin/utc';
 import weekOfYear from 'dayjs/plugin/weekOfYear';
 import { EChartsOption } from 'echarts';
-import ReactECharts from 'echarts-for-react';
+import { lazy, Suspense } from 'react';
+
+const ReactECharts = lazy(() => import('echarts-for-react'));
+
 import countBy from 'lodash-es/countBy';
 import groupBy from 'lodash-es/groupBy';
 import mapValues from 'lodash-es/mapValues';
@@ -83,64 +86,66 @@ export function StargazersGraph({ stargazers, releases }: { stargazers: Stargaze
 
   return (
     <div className="flex max-sm:flex-col gap-2">
-      <ReactECharts
-        className="h-full! grow"
-        option={
-          {
-            grid: { left: 40, top: 20, right: 20, bottom: 20 },
-            tooltip: {
-              trigger: 'axis'
-            },
-            dataset: {
-              dimensions: ['date', 'stargazers'],
-              source: series
-            },
-            xAxis: {
-              type: 'category',
-              axisTick: { show: true }
-            },
-            yAxis: scale === 'linear' ? { type: 'value' } : { type: 'log', logBase: 2 },
-            series: [
-              {
-                name: 'Stargazers',
-                type: 'line',
-                showSymbol: false,
-                markLine: {
-                  animation: false,
-                  label: { show: true, position: 'insideEndTop' },
-                  lineStyle: { type: 'dashed', opacity: 0.5 },
-                  data: [
-                    showAvg && type === 'absolute' ? { type: 'median' as const, name: 'Median' } : null,
-                    showMax && type === 'absolute' ? { type: 'max' as const, name: 'Max' } : null
-                  ].filter((m) => m !== null)
-                },
-                markPoint: {
-                  tooltip: {
-                    trigger: 'item',
-                    formatter: `<b>Releases:</b> {b}`,
-                    borderColor: 'transparent'
+      <Suspense fallback={<div className="h-full! grow bg-gray-100 animate-pulse" />}>
+        <ReactECharts
+          className="h-full! grow"
+          option={
+            {
+              grid: { left: 40, top: 20, right: 20, bottom: 20 },
+              tooltip: {
+                trigger: 'axis'
+              },
+              dataset: {
+                dimensions: ['date', 'stargazers'],
+                source: series
+              },
+              xAxis: {
+                type: 'category',
+                axisTick: { show: true }
+              },
+              yAxis: scale === 'linear' ? { type: 'value' } : { type: 'log', logBase: 2 },
+              series: [
+                {
+                  name: 'Stargazers',
+                  type: 'line',
+                  showSymbol: false,
+                  markLine: {
+                    animation: false,
+                    label: { show: true, position: 'insideEndTop' },
+                    lineStyle: { type: 'dashed', opacity: 0.5 },
+                    data: [
+                      showAvg && type === 'absolute' ? { type: 'median' as const, name: 'Median' } : null,
+                      showMax && type === 'absolute' ? { type: 'max' as const, name: 'Max' } : null
+                    ].filter((m) => m !== null)
                   },
-                  data: showReleases
-                    ? Object.entries(releasesSeries).map(([date, releases]) => ({
-                        symbol:
-                          'image://data:image/svg+xml;base64,PHN2ZyAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiAgd2lkdGg9IjI0IiAgaGVpZ2h0PSIyNCIgIHZpZXdCb3g9IjAgMCAyNCAyNCIgIGZpbGw9ImN1cnJlbnRDb2xvciIgIGNsYXNzPSJpY29uIGljb24tdGFibGVyIGljb25zLXRhYmxlci1maWxsZWQgaWNvbi10YWJsZXItdGFnIj48cGF0aCBzdHJva2U9Im5vbmUiIGQ9Ik0wIDBoMjR2MjRIMHoiIGZpbGw9Im5vbmUiLz48cGF0aCBkPSJNMTEuMTcyIDJhMyAzIDAgMCAxIDIuMTIxIC44NzlsNy43MSA3LjcxYTMuNDEgMy40MSAwIDAgMSAwIDQuODIybC01LjU5MiA1LjU5MmEzLjQxIDMuNDEgMCAwIDEgLTQuODIyIDBsLTcuNzEgLTcuNzFhMyAzIDAgMCAxIC0uODc5IC0yLjEyMXYtNS4xNzJhNCA0IDAgMCAxIDQgLTR6bS0zLjY3MiAzLjVhMiAyIDAgMCAwIC0xLjk5NSAxLjg1bC0uMDA1IC4xNWEyIDIgMCAxIDAgMiAtMiIgLz48L3N2Zz4=',
-                        symbolSize: 15,
-                        symbolRotate: 90,
-                        symbolOffset: ['50%', '-50%'],
-                        itemStyle: { color: 'red', borderColor: 'red', opacity: 0.5 },
-                        symbolKeepAspect: true,
-                        name:
-                          releases.slice(0, 3).join(', ') + (releases.length > 3 ? ` (+${releases.length - 3})` : ''),
-                        yAxis: series.find((s) => s.date === date)?.stargazers || 0,
-                        xAxis: date
-                      }))
-                    : []
+                  markPoint: {
+                    tooltip: {
+                      trigger: 'item',
+                      formatter: `<b>Releases:</b> {b}`,
+                      borderColor: 'transparent'
+                    },
+                    data: showReleases
+                      ? Object.entries(releasesSeries).map(([date, releases]) => ({
+                          symbol:
+                            'image://data:image/svg+xml;base64,PHN2ZyAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiAgd2lkdGg9IjI0IiAgaGVpZ2h0PSIyNCIgIHZpZXdCb3g9IjAgMCAyNCAyNCIgIGZpbGw9ImN1cnJlbnRDb2xvciIgIGNsYXNzPSJpY29uIGljb24tdGFibGVyIGljb25zLXRhYmxlci1maWxsZWQgaWNvbi10YWJsZXItdGFnIj48cGF0aCBzdHJva2U9Im5vbmUiIGQ9Ik0wIDBoMjR2MjRIMHoiIGZpbGw9Im5vbmUiLz48cGF0aCBkPSJNMTEuMTcyIDJhMyAzIDAgMCAxIDIuMTIxIC44NzlsNy43MSA3LjcxYTMuNDEgMy40MSAwIDAgMSAwIDQuODIybC01LjU5MiA1LjU5MmEzLjQxIDMuNDEgMCAwIDEgLTQuODIyIDBsLTcuNzEgLTcuNzFhMyAzIDAgMCAxIC0uODc5IC0yLjEyMXYtNS4xNzJhNCA0IDAgMCAxIDQgLTR6bS0zLjY3MiAzLjVhMiAyIDAgMCAwIC0xLjk5NSAxLjg1bC0uMDA1IC4xNWEyIDIgMCAxIDAgMiAtMiIgLz48L3N2Zz4=',
+                          symbolSize: 15,
+                          symbolRotate: 90,
+                          symbolOffset: ['50%', '-50%'],
+                          itemStyle: { color: 'red', borderColor: 'red', opacity: 0.5 },
+                          symbolKeepAspect: true,
+                          name:
+                            releases.slice(0, 3).join(', ') + (releases.length > 3 ? ` (+${releases.length - 3})` : ''),
+                          yAxis: series.find((s) => s.date === date)?.stargazers || 0,
+                          xAxis: date
+                        }))
+                      : []
+                  }
                 }
-              }
-            ]
-          } satisfies EChartsOption
-        }
-      />
+              ]
+            } satisfies EChartsOption
+          }
+        />
+      </Suspense>
       <div className="flex flex-col justify-center sm:w-48 sm:gap-4 sm:mt-[-2em] max-sm:grid max-sm:grid-cols-2 max-sm:gap-2 max-sm:mx-4">
         <Select
           label="Series"

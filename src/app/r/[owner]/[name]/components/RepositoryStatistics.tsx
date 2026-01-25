@@ -1,12 +1,15 @@
 import dayjs from 'dayjs';
 import { EChartsOption } from 'echarts';
-import ReactECharts from 'echarts-for-react';
+import { lazy, Suspense } from 'react';
+
+const ReactECharts = lazy(() => import('echarts-for-react'));
+
 import countBy from 'lodash-es/countBy';
 import orderBy from 'lodash-es/orderBy';
-import numeral from 'numeral';
 import { useMemo } from 'react';
 import { User } from '@/core';
 import { ActorInfo } from '@/entities/ActorInfo';
+import IntlNumberFormat from '@/helpers/intl/number';
 import { SocialPlatforms } from '@/helpers/social';
 
 /**
@@ -37,7 +40,7 @@ function FollowersFollowingChart({ actors, className }: { actors: ActorInfo[]; c
             axisPointer: { type: 'cross' },
             // biome-ignore lint/suspicious/noExplicitAny: Disable any for ECharts params
             formatter: (params: any) => {
-              return `<b>${params[0].data.user}</b> <br/> Followers: ${numeral(params[0].data.followers).format('0,0')} <br/> Following: ${numeral(params[0].data.following).format('0,0')}`;
+              return `<b>${params[0].data.user}</b> <br/> Followers: ${IntlNumberFormat(params[0].data.followers)} <br/> Following: ${IntlNumberFormat(params[0].data.following)}`;
             }
           },
           xAxis: {
@@ -97,7 +100,8 @@ function AccountAgeChart({ actors, className }: { actors: ActorInfo[]; className
           tooltip: {
             trigger: 'item',
             // biome-ignore lint/suspicious/noExplicitAny: Disable any for ECharts params
-            formatter: (params: any) => `<b>${params.value.age} year(s):</b> ${params.value.count} users`
+            formatter: (params: any) =>
+              `<b>${params.value.age} year(s):</b> ${IntlNumberFormat(params.value.count)} users`
           },
           xAxis: {
             type: 'category',
@@ -154,8 +158,7 @@ function AvailabilityChart({ actors, className }: { actors: ActorInfo[]; classNa
             trigger: 'axis',
             axisPointer: { type: 'shadow' },
             // biome-ignore lint/suspicious/noExplicitAny: Disable any for ECharts params
-            formatter: ([params]: any) =>
-              `<b>${params.value.key}:</b> ${numeral(params.value.count).format('0,0')} users`
+            formatter: ([params]: any) => `<b>${params.value.key}:</b> ${IntlNumberFormat(params.value.count)} users`
           },
           xAxis: {
             type: 'value',
@@ -199,9 +202,15 @@ function AvailabilityChart({ actors, className }: { actors: ActorInfo[]; classNa
 export default function RepositoryStatistics(props: { actors: ActorInfo[] }) {
   return (
     <div className="w-full flex max-sm:flex-col gap-x-2">
-      <FollowersFollowingChart {...props} className="w-1/3 h-80 max-sm:w-full max-sm:h-56!" />
-      <AccountAgeChart {...props} className="w-1/3 h-80 max-sm:w-full max-sm:h-56!" />
-      <AvailabilityChart {...props} className="w-1/3 h-80 max-sm:w-full max-sm:h-56!" />
+      <Suspense fallback={<div className="w-1/3 h-80 bg-gray-100 animate-pulse" />}>
+        <FollowersFollowingChart {...props} className="w-1/3 h-80 max-sm:w-full max-sm:h-56!" />
+      </Suspense>
+      <Suspense fallback={<div className="w-1/3 h-80 bg-gray-100 animate-pulse" />}>
+        <AccountAgeChart {...props} className="w-1/3 h-80 max-sm:w-full max-sm:h-56!" />
+      </Suspense>
+      <Suspense fallback={<div className="w-1/3 h-80 bg-gray-100 animate-pulse" />}>
+        <AvailabilityChart {...props} className="w-1/3 h-80 max-sm:w-full max-sm:h-56!" />
+      </Suspense>
     </div>
   );
 }

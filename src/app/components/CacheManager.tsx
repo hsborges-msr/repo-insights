@@ -12,9 +12,9 @@ import {
   useDisclosure
 } from '@heroui/react';
 import { IconTrash } from '@tabler/icons-react';
-import numeral from 'numeral';
 import { useCallback, useReducer } from 'react';
 import { useAsync } from 'react-use';
+import IntlNumberFormat from '@/helpers/intl/number';
 
 export default function CacheManager(props: UseDisclosureProps) {
   const { isOpen, onOpenChange, onClose } = useDisclosure(props);
@@ -59,7 +59,7 @@ export default function CacheManager(props: UseDisclosureProps) {
           {databases.value?.length ? (
             <>
               <p className="border-y text-center text-sm text-gray-600" hidden={!usage.value}>
-                Estimated usage: <span className="text-red-400">{numeral(usage.value).format('0.0b')}</span>
+                Estimated usage: <span className="text-red-400">{IntlNumberFormat(usage.value)}</span>
               </p>
               <p>At the moment, we have cached data from the following repositories:</p>
             </>
