@@ -7,7 +7,9 @@ import { twMerge } from 'tailwind-merge';
 import { env } from '@/helpers/env/browser';
 
 /**
- *  SignInButton component
+ * SignInButton component that redirects users to GitHub OAuth.
+ *
+ * - Builds the OAuth URL from GH_CLIENT_ID and the current location
  */
 const SignInButton = memo(function SignInButton(props: ButtonProps) {
   const pathname = usePathname();
