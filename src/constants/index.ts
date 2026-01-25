@@ -26,11 +26,20 @@ export const PAGINATION = {
 export const DATE_FORMATS = {
   LONG: 'LLL',
   SHORT: 'L',
-  RELATIVE: 'fromNow'
+  // semantic key: use dayjs().fromNow() when RELATIVE is requested
+  RELATIVE: 'relative'
 } as const;
 
 // GitHub OAuth
 export const GITHUB_CONFIG = {
   OAUTH_URL: 'https://github.com/login/oauth/authorize',
-  SCOPE: 'read:user'
+  SCOPE: 'public_repo read:user user:email read:org'
 } as const;
+
+// Expected env var name for GitHub client id (documented here for discoverability)
+export const GITHUB_CLIENT_ID_KEY = 'GH_CLIENT_ID' as const;
+
+// Export types for consumers
+export type PaginationConfig = typeof PAGINATION;
+export type ApiConfig = typeof API_CONFIG;
+export type GithubConfig = typeof GITHUB_CONFIG;

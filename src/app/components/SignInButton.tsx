@@ -16,6 +16,17 @@ const SignInButton = memo(function SignInButton(props: ButtonProps) {
 
   const [isLoading, setIsLoading] = useState(false);
 
+  const handleClick = () => {
+    setIsLoading(true);
+    const origin = window.location.origin;
+    const url = `${env.GH_OAUTH_URL || 'https://github.com/login/oauth/authorize'}?${queryString.stringify({
+      client_id: env.GH_CLIENT_ID,
+      redirect_uri: `${origin}${pathname}`,
+      scope: env.GH_OAUTH_SCOPE || 'public_repo read:user user:email read:org'
+    })}`;
+    window.location.href = url;
+  };
+
   return (
     <Button
       {...props}
@@ -26,17 +37,7 @@ const SignInButton = memo(function SignInButton(props: ButtonProps) {
       disabled={isLoading || props.disabled}
       onClick={(e) => {
         e.preventDefault();
-        setIsLoading(true);
-
-        // Safe to access `window` here because this runs in a user event
-        const origin = window.location.origin;
-        const url = `https://github.com/login/oauth/authorize?${queryString.stringify({
-          client_id: env.GH_CLIENT_ID,
-          redirect_uri: `${origin}${pathname}`,
-          scope: 'public_repo read:user user:email read:org'
-        })}`;
-
-        window.location.href = url;
+        handleClick();
       }}
     >
       {isLoading ? 'Signing in...' : 'Sign In'}
