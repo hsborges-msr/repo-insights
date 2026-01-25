@@ -4,7 +4,9 @@ import { IconError404 } from '@tabler/icons-react';
 /**
  *  Repository not found component
  */
-export default function RepositoryNotFound() {
+import { memo } from 'react';
+
+const RepositoryNotFound = memo(function RepositoryNotFound() {
   return (
     <div className="flex w-full h-1/2 items-center justify-center max-sm:px-4">
       <Alert
@@ -12,7 +14,7 @@ export default function RepositoryNotFound() {
         title="Sorry, couldn't fetch the repository"
         description={
           <div className="w-full text-justify">
-            The repository you are looking for does not exist or you not have access.
+            The repository you are looking for does not exist or you may not have access.
             <br />
             Please make sure to follow the format <strong>owner/name</strong>
           </div>
@@ -27,4 +29,6 @@ export default function RepositoryNotFound() {
       />
     </div>
   );
-}
+});
+
+export default RepositoryNotFound;

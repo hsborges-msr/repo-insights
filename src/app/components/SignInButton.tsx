@@ -2,14 +2,14 @@ import { Button, ButtonProps } from '@heroui/react';
 import { IconBrandGithubFilled } from '@tabler/icons-react';
 import { usePathname } from 'next/navigation';
 import queryString from 'query-string';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 import { env } from '@/helpers/env/browser';
 
 /**
  *  SignInButton component
  */
-export default function SignInButton(props: ButtonProps) {
+const SignInButton = memo(function SignInButton(props: ButtonProps) {
   const pathname = usePathname();
 
   const [origin, setOrigin] = useState('');
@@ -32,4 +32,6 @@ export default function SignInButton(props: ButtonProps) {
       Sign In
     </Button>
   );
-}
+});
+
+export default SignInButton;

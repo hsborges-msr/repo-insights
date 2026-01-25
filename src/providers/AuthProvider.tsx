@@ -7,11 +7,11 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import { Actor } from '@/core';
 import { createService } from '@/helpers/github/browser';
 
-  type UserProfile = {
-    user: (Actor & { __access_token: string }) | null;
-    signIn: (accessToken: string) => Promise<void>;
-    signOut: () => Promise<void>;
-  };
+type UserProfile = {
+  user: (Actor & { __access_token: string }) | null;
+  signIn: (accessToken: string) => Promise<void>;
+  signOut: () => Promise<void>;
+};
 
 export const AuthContext = createContext<StoreApi<UserProfile> | null>(null);
 
@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       persist<UserProfile>(
         (set) => ({
           user: null,
-            signIn: async (accessToken: string) => {
+          signIn: async (accessToken: string) => {
             const user = await createService('profile', accessToken, false).viewer();
             set({ user: { ...user!, __access_token: accessToken } });
           },

@@ -1,12 +1,12 @@
 import { IconBrandLinkedin, IconBrandTwitter, IconHeartFilled, IconMail } from '@tabler/icons-react';
 import Link from 'next/link';
-import { ComponentPropsWithoutRef } from 'react';
+import { ComponentPropsWithoutRef, memo } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 /**
  *  Footnote component
  */
-export default function Footnote(props: ComponentPropsWithoutRef<'div'>) {
+const Footnote = memo(function Footnote(props: ComponentPropsWithoutRef<'div'>) {
   return (
     <div
       {...props}
@@ -36,4 +36,6 @@ export default function Footnote(props: ComponentPropsWithoutRef<'div'>) {
       </span>
     </div>
   );
-}
+});
+
+export default Footnote;

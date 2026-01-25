@@ -5,8 +5,8 @@ import { IconFaceIdError, IconShieldLock } from '@tabler/icons-react';
  *  RepositoryError component
  */
 // biome-ignore lint/suspicious/noExplicitAny: Accept any error type
-export default function RepositoryError(props: { error: any }) {
-  if (props.error.status === 401) {
+const RepositoryError = function RepositoryError(props: { error: any }) {
+  if (props.error?.status === 401) {
     return (
       <div className="flex w-full h-1/2 items-center justify-center max-sm:px-4">
         <Alert
@@ -33,13 +33,15 @@ export default function RepositoryError(props: { error: any }) {
     );
   }
 
+  const message = props.error?.message ?? 'An unexpected error occurred.';
+
   return (
     <div className="flex w-full h-full items-center justify-center">
       <Alert
         color="danger"
         icon={<IconFaceIdError />}
-        title={props.error.message}
-        description={JSON.stringify(props.error, null, ' ')}
+        title={message}
+        description={process.env.NODE_ENV === 'development' ? JSON.stringify(props.error, null, 2) : message}
         classNames={{
           base: 'w-auto grow-0 px-8',
           alertIcon: 'w-8 h-8',
@@ -50,4 +52,6 @@ export default function RepositoryError(props: { error: any }) {
       />
     </div>
   );
-}
+};
+
+export default RepositoryError;

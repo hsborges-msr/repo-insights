@@ -46,8 +46,8 @@ export default function RepositoryTable({ actors }: { actors: ActorInfo[] }) {
           actors || [],
           descriptor.map((desc) =>
             desc.column === 'events'
-              ? (e: Actor & { events?: Array<Record<string, unknown>> }) => (e.events?.length || 0)
-              : (e: Actor & Record<string, unknown>) => (e[desc.column as keyof Actor] ?? '')
+              ? (e: Actor & { events?: Array<Record<string, unknown>> }) => e.events?.length || 0
+              : (e: Actor & Record<string, unknown>) => e[desc.column as keyof Actor] ?? ''
           ),
           descriptor.map((desc) => (desc.direction === 'ascending' ? 'asc' : 'desc'))
         )
