@@ -1,8 +1,11 @@
 'use client';
 
+import flatten from 'lodash-es/flatten';
+import groupBy from 'lodash-es/groupBy';
+import mapValues from 'lodash-es/mapValues';
+import orderBy from 'lodash-es/orderBy';
 import { Alert, Button, Skeleton, Spinner } from '@heroui/react';
 import { IconPlayerPauseFilled, IconPlayerPlayFilled } from '@tabler/icons-react';
-import { flatten, groupBy, mapValues, orderBy } from 'lodash';
 import { useParams } from 'next/navigation';
 import numeral from 'numeral';
 import { useEffect, useMemo } from 'react';

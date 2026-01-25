@@ -64,7 +64,7 @@ export default function useResources<T extends RepositoryNode>(
         if (paused || !repo) return;
 
         // @ts-expect-error - This is a hack to avoid type errors
-        const it = createService(repo.name_with_owner, user?.__acess_token).resources(resource, {
+        const it = createService(repo.name_with_owner, user?.__access_token).resources(resource, {
           repository: repo.id,
           cursor: data.cursor || undefined
         });

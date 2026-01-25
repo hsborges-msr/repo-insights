@@ -7,5 +7,5 @@ import useAuth from './useAuth';
  */
 export default function useRepository(owner: string, name: string) {
   const { user } = useAuth();
-  return useAsync(async () => createService(undefined, user?.__acess_token).repository(owner, name), [user]);
+  return useAsync(async () => createService(undefined, user?.__access_token).repository(owner, name), [user]);
 }

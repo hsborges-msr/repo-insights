@@ -1,7 +1,7 @@
 import { Avatar, AvatarGroup, Link, Tooltip } from '@heroui/react';
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
-import { orderBy } from 'lodash';
+import orderBy from 'lodash-es/orderBy';
 import numeral from 'numeral';
 import { useMemo } from 'react';
 import { User } from '@/core';

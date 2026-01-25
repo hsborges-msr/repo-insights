@@ -18,7 +18,8 @@ import { IconDownload, IconMail } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 import relativeFormat from 'dayjs/plugin/relativeTime';
-import { countBy, orderBy } from 'lodash';
+import countBy from 'lodash-es/countBy';
+import orderBy from 'lodash-es/orderBy';
 import Link from 'next/link';
 import numeral from 'numeral';
 import { useMemo, useState } from 'react';
@@ -44,7 +45,9 @@ export default function RepositoryTable({ actors }: { actors: ActorInfo[] }) {
       ? orderBy(
           actors || [],
           descriptor.map((desc) =>
-            desc.column === 'events' ? (e) => e.events.length : (e) => e[desc.column as keyof Actor] ?? ''
+            desc.column === 'events'
+              ? (e: Actor & { events?: Array<Record<string, unknown>> }) => (e.events?.length || 0)
+              : (e: Actor & Record<string, unknown>) => (e[desc.column as keyof Actor] ?? '')
           ),
           descriptor.map((desc) => (desc.direction === 'ascending' ? 'asc' : 'desc'))
         )
@@ -154,10 +157,10 @@ export default function RepositoryTable({ actors }: { actors: ActorInfo[] }) {
         </TableColumn>
       </TableHeader>
       <TableBody emptyContent="No stargazers found" loadingContent={<Spinner label="Loading..." />}>
-        {items.map((item, index) => {
+        {items.map((item) => {
           const user = item as User;
           return (
-            <TableRow key={index}>
+            <TableRow key={user.id}>
               <TableCell>
                 <div className="flex gap-3 items-center">
                   <UserAvatar
@@ -170,9 +173,9 @@ export default function RepositoryTable({ actors }: { actors: ActorInfo[] }) {
               <TableCell>
                 {Object.entries(countBy(item.events, 'type'))
                   .map(([event, count]) => `${event}: ${count}`)
-                  .map((s, index) => (
-                    <div key={index} className="text-xs">
-                      {s}
+                  .map(([event, count]) => (
+                    <div key={event} className="text-xs">
+                      {event}: {count}
                     </div>
                   ))}
               </TableCell>

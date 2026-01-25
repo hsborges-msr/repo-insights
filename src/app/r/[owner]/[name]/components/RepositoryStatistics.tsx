@@ -1,7 +1,8 @@
-import dayjs from 'dayjs';
 import { EChartsOption } from 'echarts';
 import ReactECharts from 'echarts-for-react';
-import { countBy, orderBy } from 'lodash';
+import countBy from 'lodash-es/countBy';
+import orderBy from 'lodash-es/orderBy';
+import dayjs from 'dayjs';
 import numeral from 'numeral';
 import { useMemo } from 'react';
 import { User } from '@/core';

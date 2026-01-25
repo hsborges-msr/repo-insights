@@ -69,8 +69,8 @@ export default function CacheManager(props: UseDisclosureProps) {
 
           <ul className="list-disc list-inside">
             {version &&
-              databases.value?.map((db, index) => (
-                <li key={index}>
+              databases.value?.map((db) => (
+                <li key={db.name}>
                   <div className="inline-flex items-center">
                     <span>
                       <Link href={`/r/${db.name}`} color="foreground" className={db.deleted ? 'line-through' : ''}>
