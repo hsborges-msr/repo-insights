@@ -48,6 +48,10 @@ yarn build
 yarn start
 ```
 
+### Migration / Re-auth
+
+If you previously signed in, note that the app's access token storage key was renamed to `__access_token`. Your browser's local data may not migrate automatically — you may need to sign in again. See `DOCS/CHANGELOG.md` for more context.
+
 ## Core Library Management
 
 The core library is automatically managed during installation, but you can manually rebuild it if needed:
