@@ -64,6 +64,7 @@
     "@types/numeral": "^2.0.5",
     "@types/react": "19.2.7",
     "@vitest/coverage-v8": "^4.0.16",
+    "agent-browser": "^0.7.6",
     "commitizen": "^4.3.1",
     "cz-conventional-changelog": "^3.3.0",
     "dotenv-flow": "^4.1.0",
