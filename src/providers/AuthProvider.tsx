@@ -78,17 +78,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const store = useStore(storeRef.current as StoreApi<UserProfile>);
 
   useEffect(() => {
-    if (code) {
-      const controller = new AbortController();
-      fetch(`/api/auth/github/access_token?code=${code}`, { signal: controller.signal })
-        .then((response) => response.json())
-        .then((response) => {
-          if (!controller.signal.aborted && response.access_token) store.signIn(response.access_token);
-        })
-        .finally(() => router.push(pathname));
+    if (!code) return;
 
-      return () => controller.abort();
-    }
+    const controller = new AbortController();
+
+    (async () => {
+      try {
+        const res = await fetch(`/api/auth/github/access_token?code=${code}`, { signal: controller.signal });
+        const body = await res.json();
+        if (!controller.signal.aborted && body.access_token) await store.signIn(body.access_token);
+      } catch (_e) {
+        // swallow aborted or network errors — auth flow should not crash the app
+      } finally {
+        router.push(pathname);
+      }
+    })();
+
+    return () => controller.abort();
   }, [code]);
 
   return <AuthContext.Provider value={storeRef.current}>{children}</AuthContext.Provider>;

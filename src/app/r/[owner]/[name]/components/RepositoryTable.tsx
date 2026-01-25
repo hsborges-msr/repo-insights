@@ -46,6 +46,7 @@ export default function RepositoryTable({ actors }: { actors: ActorInfo[] }) {
   const [descriptor, setDescriptor] = useState<SortDescriptor[]>([]);
   const [showDetails, setShowDetails] = useBoolean(false);
 
+  // Memoize sorted + paginated items to avoid heavy work on each render
   const items = useMemo(() => {
     const orderedItems = descriptor
       ? orderBy(
