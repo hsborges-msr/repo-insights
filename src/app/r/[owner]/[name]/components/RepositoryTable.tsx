@@ -24,6 +24,7 @@ import Link from 'next/link';
 import numeral from 'numeral';
 import { useMemo, useState } from 'react';
 import { useBoolean } from 'react-use';
+import { PAGINATION } from '@/constants';
 import { Actor, User } from '@/core';
 import { ActorInfo } from '@/entities/ActorInfo';
 import { SocialPlatforms } from '@/helpers/social';
@@ -41,7 +42,7 @@ dayjs.extend(relativeFormat);
  */
 export default function RepositoryTable({ actors }: { actors: ActorInfo[] }) {
   const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState<number>(10);
+  const [perPage, setPerPage] = useState<number>(PAGINATION.DEFAULT_PAGE_SIZE);
   const [descriptor, setDescriptor] = useState<SortDescriptor[]>([]);
   const [showDetails, setShowDetails] = useBoolean(false);
 
@@ -114,12 +115,11 @@ export default function RepositoryTable({ actors }: { actors: ActorInfo[] }) {
               variant="underlined"
               size="sm"
               defaultSelectedKeys={new Set([`${perPage}`])}
-              onSelectionChange={(values) => setPerPage(Number(values.currentKey || '10'))}
+              onSelectionChange={(values) => setPerPage(Number(values.currentKey || `${PAGINATION.DEFAULT_PAGE_SIZE}`))}
             >
-              <SelectItem key={10}>10</SelectItem>
-              <SelectItem key={25}>25</SelectItem>
-              <SelectItem key={50}>50</SelectItem>
-              <SelectItem key={100}>100</SelectItem>
+              {PAGINATION.PAGE_SIZE_OPTIONS.map((opt) => (
+                <SelectItem key={opt}>{opt}</SelectItem>
+              ))}
             </Select>
           </div>
         </div>
