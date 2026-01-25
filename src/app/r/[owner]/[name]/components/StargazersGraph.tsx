@@ -19,7 +19,12 @@ dayjs.extend(weekOfYear);
 dayjs.extend(advancedFormat);
 
 /**
+ * Line chart visualizing stargazer activity over time with optional release markers.
  *
+ * - Supports absolute or cumulative series, multiple granularities and linear/log scales
+ *
+ * @param stargazers Array of Stargazer events (starred_at)
+ * @param releases Optional list of releases used to mark events on the chart
  */
 export function StargazersGraph({ stargazers, releases }: { stargazers: Stargazer[]; releases?: Release[] }) {
   const [type, setType] = useState<'absolute' | 'cumulative'>('absolute');

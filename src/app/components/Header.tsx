@@ -27,7 +27,9 @@ import CacheManager from './CacheManager';
 import SignInButton from './SignInButton';
 
 /**
- *  AppHeader component
+ * App header with navigation, search and authentication controls.
+ *
+ * - Shows a search input (on non-home pages), user dropdown when signed in, and sign-in button otherwise
  */
 export default function Header(props: NavbarProps) {
   const router = useRouter();

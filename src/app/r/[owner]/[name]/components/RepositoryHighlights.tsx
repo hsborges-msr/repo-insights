@@ -10,7 +10,11 @@ import { ActorInfo } from '@/entities/ActorInfo';
 dayjs.extend(localizedFormat);
 
 /**
- *  Highlights component
+ * Small reusable highlights block used by RepositoryHighlights.
+ *
+ * @param data.title Section title
+ * @param data.actors Actors to render inside the AvatarGroup
+ * @param data.description Formatter that returns the tooltip description per actor
  */
 function Highlights(data: {
   title: string;
@@ -53,7 +57,9 @@ function Highlights(data: {
 }
 
 /**
- *  RepositoryHighlights component
+ * High-level highlights for a repository, e.g. oldest stargazers, most followers.
+ *
+ * @param actors Array of ActorInfo used to compute each highlight group
  */
 export default function RepositoryHighlights({ actors }: { actors: ActorInfo[] }) {
   const sorted = useMemo(

@@ -36,7 +36,15 @@ export default function useResources(
 ): IterableAsyncState<Watcher>;
 
 /**
- *  Hook to fetch tags of a repository
+ * Hook to iterate over repository resources (stargazers, releases, watchers).
+ *
+ * - Creates a paginated async iterator from the core service and accumulates results
+ * - Returns a controlled IterableAsyncState with `hasMore` and `cached` flags
+ *
+ * @param owner Repository owner
+ * @param name Repository name
+ * @param resource Resource type to fetch ('stargazers' | 'releases' | 'watchers')
+ * @param paused When true, the hook will not start fetching
  */
 export default function useResources<T extends RepositoryNode>(
   owner: string,

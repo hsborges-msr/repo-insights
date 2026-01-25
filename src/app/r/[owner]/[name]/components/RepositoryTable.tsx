@@ -32,7 +32,12 @@ dayjs.extend(localizedFormat);
 dayjs.extend(relativeFormat);
 
 /**
+ * Table view for repository actors (stargazers/watchers).
  *
+ * - Displays paginated results with sortable columns and optional details
+ * - Supports exporting the current actor list as JSON
+ *
+ * @param props.actors Array of ActorInfo objects to render
  */
 export default function RepositoryTable({ actors }: { actors: ActorInfo[] }) {
   const [page, setPage] = useState(1);

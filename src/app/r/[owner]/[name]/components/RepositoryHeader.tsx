@@ -17,7 +17,10 @@ import { twMerge } from 'tailwind-merge';
 import { Repository, User } from '@/core';
 
 /**
- *  RepositoryHeader component
+ * Repository header showing repo owner, name and quick stats.
+ *
+ * @param repo Repository object with counts and owner information
+ * @param className Optional CSS className to apply to the root container
  */
 export function RepositoryHeader({ repo, className }: { repo: Repository; className?: string }) {
   const details: Array<{ Icon: Icon; label: string; value?: number }> = useMemo(

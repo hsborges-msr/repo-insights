@@ -10,7 +10,10 @@ import { ActorInfo } from '@/entities/ActorInfo';
 import { SocialPlatforms } from '@/helpers/social';
 
 /**
+ * Scatter chart showing followers vs following for each actor.
  *
+ * @param actors List of ActorInfo items used as the dataset
+ * @param className Optional CSS className applied to the chart container
  */
 function FollowersFollowingChart({ actors, className }: { actors: ActorInfo[]; className?: string }) {
   return (
@@ -65,7 +68,10 @@ function FollowersFollowingChart({ actors, className }: { actors: ActorInfo[]; c
 }
 
 /**
+ * Bar chart aggregating account ages (years since creation).
  *
+ * @param actors List of ActorInfo items used to compute account ages
+ * @param className Optional CSS className applied to the chart container
  */
 function AccountAgeChart({ actors, className }: { actors: ActorInfo[]; className?: string }) {
   const grouped = useMemo(
@@ -111,7 +117,10 @@ function AccountAgeChart({ actors, className }: { actors: ActorInfo[]; className
 }
 
 /**
+ * Horizontal bar chart showing availability of social platforms among actors.
  *
+ * @param actors List of ActorInfo items used to compute social availability
+ * @param className Optional CSS className applied to the chart container
  */
 function AvailabilityChart({ actors, className }: { actors: ActorInfo[]; className?: string }) {
   const data = useMemo(
@@ -183,7 +192,9 @@ function AvailabilityChart({ actors, className }: { actors: ActorInfo[]; classNa
 }
 
 /**
+ * Dashboard of repository actor statistics (multiple charts).
  *
+ * @param props.actors List of ActorInfo used across the charts
  */
 export default function RepositoryStatistics(props: { actors: ActorInfo[] }) {
   return (
