@@ -24,7 +24,8 @@ import Link from 'next/link';
 import numeral from 'numeral';
 import { useMemo, useState } from 'react';
 import { useBoolean } from 'react-use';
-import { PAGINATION } from '@/constants';
+
+import { DATE_FORMATS, PAGINATION } from '@/constants';
 import { Actor, User } from '@/core';
 import { ActorInfo } from '@/entities/ActorInfo';
 import { SocialPlatforms } from '@/helpers/social';
@@ -105,9 +106,9 @@ export default function RepositoryTable({ actors }: { actors: ActorInfo[] }) {
             showControls
             showShadow
             size="sm"
-            page={1}
+            page={page}
             total={Math.ceil(actors.length / perPage)}
-            onChange={(page) => setPage(page)}
+            onChange={(p) => setPage(p)}
           />
           <div className="flex w-36 max-sm:hidden">
             <Select
@@ -187,7 +188,7 @@ export default function RepositoryTable({ actors }: { actors: ActorInfo[] }) {
               <TableCell>{numeral(user.followers_count).format('0,0')}</TableCell>
               <TableCell>{numeral(user.following_count).format('0,0')}</TableCell>
               <TableCell>
-                <abbr title={`Created at ${dayjs(user.created_at).format('LLL')}`}>
+                <abbr title={`Created at ${dayjs(user.created_at).format(DATE_FORMATS.LONG)}`}>
                   {dayjs(user.created_at).fromNow(true)}
                 </abbr>
               </TableCell>

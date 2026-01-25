@@ -4,6 +4,7 @@ import localizedFormat from 'dayjs/plugin/localizedFormat';
 import orderBy from 'lodash-es/orderBy';
 import numeral from 'numeral';
 import { useMemo } from 'react';
+import { DATE_FORMATS } from '@/constants';
 import { User } from '@/core';
 import { ActorInfo } from '@/entities/ActorInfo';
 
@@ -82,7 +83,9 @@ export default function RepositoryHighlights({ actors }: { actors: ActorInfo[] }
               b.events.find((e) => e.type === 'starred')!.date.getTime()
           )
           .slice(0, 5)}
-        description={(actor) => `Since ${dayjs(actor.events.find((e) => e.type === 'starred')!.date).format('lll')}`}
+        description={(actor) =>
+          `Since ${dayjs(actor.events.find((e) => e.type === 'starred')!.date).format(DATE_FORMATS.LONG)}`
+        }
       />
       <Highlights
         title="Most followers"

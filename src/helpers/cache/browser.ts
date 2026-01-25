@@ -1,8 +1,8 @@
 'use client';
 
-import dayjs from 'dayjs';
 import { clear, createStore, del, get, set, UseStore } from 'idb-keyval';
 import lzString from 'lz-string';
+import { CACHE_TTL } from '@/constants';
 import { Cache, CacheService, ReleaseSchema, RepositorySchema, StargazerSchema } from '@/core';
 
 /**
@@ -38,15 +38,20 @@ export class BrowserCache implements Cache {
 
     if (!value.__cached_at) return null;
 
-    const diff = dayjs().diff(value.__cached_at, 'days', true);
-    if (diff > 7) return null;
+    const ageMs = Date.now() - Number(value.__cached_at);
+
+    // Global upper bound: if older than USER TTL, drop it
+    if (ageMs > CACHE_TTL.USER) return null;
 
     if (key.startsWith(CacheService.REPOSITORY_PREFIX)) {
-      if (diff > 1) return null;
+      // Repository-specific TTL is shorter
+      if (ageMs > CACHE_TTL.REPOSITORY) return null;
       value = RepositorySchema.parse(value);
     } else if (key.startsWith(CacheService.RELEASES_PREFIX)) {
+      if (ageMs > CACHE_TTL.STARGAZERS) return null;
       Object.assign(value, { data: value.data.map((record: object) => ReleaseSchema.parse(record)) });
     } else if (key.startsWith(CacheService.STARGAZERS_PREFIX)) {
+      if (ageMs > CACHE_TTL.STARGAZERS) return null;
       Object.assign(value, { data: value.data.map((record: object) => StargazerSchema.parse(record)) });
     }
 

@@ -1,13 +1,14 @@
 import retry from 'fetch-retry';
 import pLimit from 'p-limit';
 import { Constructor } from 'type-fest';
+import { API_CONFIG } from '@/constants';
 import { Cache, CacheService, GithubClient, GithubService } from '@/core';
 
 /**
  *
  */
 function limiter(func: typeof fetch) {
-  const limit = pLimit(2);
+  const limit = pLimit(API_CONFIG.CONCURRENT_LIMIT);
 
   return async (...args: Parameters<typeof fetch>) => {
     return limit(() => func(...args));
@@ -16,8 +17,9 @@ function limiter(func: typeof fetch) {
 
 const fetcher = limiter(
   retry(fetch, {
-    retries: 3,
-    retryDelay: (attempt) => 2 ** attempt * 1000,
+    retries: API_CONFIG.MAX_RETRIES,
+    // exponential backoff starting from API_CONFIG.RETRY_DELAY
+    retryDelay: (attempt) => API_CONFIG.RETRY_DELAY * 2 ** (attempt - 1),
     retryOn: (_attempt, error, response) => {
       return !!(error !== null || response?.status === 403);
     }

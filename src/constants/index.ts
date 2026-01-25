@@ -26,7 +26,6 @@ export const PAGINATION = {
 export const DATE_FORMATS = {
   LONG: 'LLL',
   SHORT: 'L',
-  // semantic key: use dayjs().fromNow() when RELATIVE is requested
   RELATIVE: 'relative'
 } as const;
 

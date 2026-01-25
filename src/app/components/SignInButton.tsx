@@ -19,10 +19,10 @@ const SignInButton = memo(function SignInButton(props: ButtonProps) {
   const handleClick = () => {
     setIsLoading(true);
     const origin = window.location.origin;
-    const url = `${env.GH_OAUTH_URL || 'https://github.com/login/oauth/authorize'}?${queryString.stringify({
+    const url = `${env.GH_OAUTH_URL}?${queryString.stringify({
       client_id: env.GH_CLIENT_ID,
       redirect_uri: `${origin}${pathname}`,
-      scope: env.GH_OAUTH_SCOPE || 'public_repo read:user user:email read:org'
+      scope: env.GH_OAUTH_SCOPE
     })}`;
     window.location.href = url;
   };
