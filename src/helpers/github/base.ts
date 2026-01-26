@@ -2,7 +2,7 @@ import retry from 'fetch-retry';
 import pLimit from 'p-limit';
 import { Constructor } from 'type-fest';
 import { API_CONFIG } from '@/constants';
-import { Cache, CacheService, GithubClient, GithubService } from '@/core';
+import { BufferedService, Cache, CacheService, GithubClient, GithubService, Service } from '@/core';
 
 /**
  *
@@ -53,5 +53,7 @@ export function createService(namespace: string = 'public', token?: string, Cach
     }
   });
 
-  return Cache ? new CacheService(baseService, new Cache(namespace.toLowerCase())) : baseService;
+  return Cache
+    ? (new BufferedService(new CacheService(baseService, new Cache(namespace.toLowerCase())), 2) as Service)
+    : baseService;
 }
