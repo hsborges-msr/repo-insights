@@ -3,12 +3,9 @@
 import { Alert, Button, Skeleton, Spinner } from '@heroui/react';
 import { IconPlayerPauseFilled, IconPlayerPlayFilled } from '@tabler/icons-react';
 import mapValues from 'lodash-es/mapValues';
-import orderBy from 'lodash-es/orderBy';
 import { useParams } from 'next/navigation';
 import { useEffect, useMemo } from 'react';
 import { useBoolean } from 'react-use';
-import { Actor, Reaction, User } from '@/core';
-import { ActorInfo } from '@/entities/ActorInfo';
 import IntlNumberFormat from '@/helpers/intl/number';
 import useAuth from '@/hooks/useAuth';
 import useRepository from '@/hooks/useRepository';
@@ -50,7 +47,7 @@ export default function Repository() {
           releases: releases.hasMore ? (releases.value?.length || 0) / (repo.value?.releases_count || 0) : 1,
           watchers: watchers.hasMore ? (watchers.value?.length || 0) / (repo.value?.watchers_count || 0) : 1
         },
-        (v) => IntlNumberFormat(Math.min(1, v) * 100) + '%'
+        (v) => `${IntlNumberFormat(Math.min(1, v) * 100)}%`
       ),
     [repo, stars, releases, watchers]
   );
