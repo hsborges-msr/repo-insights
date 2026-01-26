@@ -38,9 +38,11 @@ function FollowersFollowingChart({ actors, className }: { actors: ActorInfo[]; c
           tooltip: {
             trigger: 'axis',
             axisPointer: { type: 'cross' },
-            // biome-ignore lint/suspicious/noExplicitAny: Disable any for ECharts params
-            formatter: (params: any) => {
-              return `<b>${params[0].data.user}</b> <br/> Followers: ${IntlNumberFormat(params[0].data.followers)} <br/> Following: ${IntlNumberFormat(params[0].data.following)}`;
+            formatter: (params: unknown) => {
+              const p = params as Array<{ data: { user?: string; followers?: number; following?: number } }>;
+              return `<b>${p[0].data.user}</b> <br/> Followers: ${IntlNumberFormat(p[0].data.followers ?? 0)} <br/> Following: ${IntlNumberFormat(
+                p[0].data.following ?? 0
+              )}`;
             }
           },
           xAxis: {
@@ -99,9 +101,10 @@ function AccountAgeChart({ actors, className }: { actors: ActorInfo[]; className
           ],
           tooltip: {
             trigger: 'item',
-            // biome-ignore lint/suspicious/noExplicitAny: Disable any for ECharts params
-            formatter: (params: any) =>
-              `<b>${params.value.age} year(s):</b> ${IntlNumberFormat(params.value.count)} users`
+            formatter: (params: unknown) => {
+              const p = params as { value: { age?: string; count?: number } };
+              return `<b>${p.value.age} year(s):</b> ${IntlNumberFormat(p.value.count ?? 0)} users`;
+            }
           },
           xAxis: {
             type: 'category',
@@ -157,8 +160,10 @@ function AvailabilityChart({ actors, className }: { actors: ActorInfo[]; classNa
           tooltip: {
             trigger: 'axis',
             axisPointer: { type: 'shadow' },
-            // biome-ignore lint/suspicious/noExplicitAny: Disable any for ECharts params
-            formatter: ([params]: any) => `<b>${params.value.key}:</b> ${IntlNumberFormat(params.value.count)} users`
+            formatter: (params: unknown) => {
+              const p = (params as Array<{ value: { key?: string; count?: number } }>)[0];
+              return `<b>${p.value.key}:</b> ${IntlNumberFormat(p.value.count ?? 0)} users`;
+            }
           },
           xAxis: {
             type: 'value',

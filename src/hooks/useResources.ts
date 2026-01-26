@@ -71,11 +71,28 @@ export default function useResources<T extends RepositoryNode>(
       .then(async () => {
         if (paused || !repo) return;
 
-        // @ts-expect-error - This is a hack to avoid type errors
-        const it = createService(repo.name_with_owner, user?.__access_token).resources(resource, {
-          repository: repo.id,
-          cursor: data.cursor || undefined
-        });
+        // Explicitly request a cached service and narrow the resource to call the
+        // appropriate overload. We cast via `unknown` to `Iterable<T>` to keep
+        // the implementation generic while preserving the public overloads above.
+        type ElementMeta = { cursor?: string; has_more: boolean; [k: string]: unknown };
+        let it: AsyncIterable<{ data: T[]; metadata: ElementMeta; __cached?: boolean }>;
+
+        if (resource === 'stargazers') {
+          it = createService(repo.name_with_owner, user?.__access_token, true).resources('stargazers', {
+            repository: repo.id,
+            cursor: data.cursor || undefined
+          }) as unknown as AsyncIterable<{ data: T[]; metadata: ElementMeta; __cached?: boolean }>;
+        } else if (resource === 'releases') {
+          it = createService(repo.name_with_owner, user?.__access_token, true).resources('releases', {
+            repository: repo.id,
+            cursor: data.cursor || undefined
+          }) as unknown as AsyncIterable<{ data: T[]; metadata: ElementMeta; __cached?: boolean }>;
+        } else {
+          it = createService(repo.name_with_owner, user?.__access_token, true).resources('watchers', {
+            repository: repo.id,
+            cursor: data.cursor || undefined
+          }) as unknown as AsyncIterable<{ data: T[]; metadata: ElementMeta; __cached?: boolean }>;
+        }
 
         let iteration = 0;
         const cache: T[] = [...data.records];
@@ -83,7 +100,7 @@ export default function useResources<T extends RepositoryNode>(
 
         for await (const element of it) {
           if (controller.signal.aborted) return;
-          const { data: records, __cached } = element as typeof element & { __cached?: boolean };
+          const { data: records, __cached } = element;
 
           cache.push(...records);
 

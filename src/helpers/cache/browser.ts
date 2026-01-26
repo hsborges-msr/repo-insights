@@ -30,11 +30,19 @@ export class BrowserCache implements Cache {
   }
 
   async get<T>(key: string): Promise<T | null> {
-    // biome-ignore lint/suspicious/noExplicitAny: Acceptable
-    let value: any = await get(key, this.cache);
+    // Stored values in IDB are compressed strings. Retrieve as `string | null`.
+    const raw = (await get<string | null>(key, this.cache)) as string | null;
+
+    if (!raw) return null;
+
+    // Decompress and parse safely to unknown, then assign __cached marker.
+    const parsed = decompress<unknown>(raw) as unknown;
+    // Ensure we operate on an object
+    if (typeof parsed !== 'object' || parsed === null) return null;
+    // Build a flexible value object with expected cache markers
+    const value = Object.assign({ __cached: true }, parsed as Record<string, unknown>);
 
     if (!value) return null;
-    else value = Object.assign({ __cached: true }, decompress(value));
 
     if (!value.__cached_at) return null;
 
@@ -46,16 +54,25 @@ export class BrowserCache implements Cache {
     if (key.startsWith(CacheService.REPOSITORY_PREFIX)) {
       // Repository-specific TTL is shorter
       if (ageMs > CACHE_TTL.REPOSITORY) return null;
-      value = RepositorySchema.parse(value);
+      return RepositorySchema.parse(value) as unknown as T;
     } else if (key.startsWith(CacheService.RELEASES_PREFIX)) {
       if (ageMs > CACHE_TTL.STARGAZERS) return null;
-      Object.assign(value, { data: value.data.map((record: object) => ReleaseSchema.parse(record)) });
+      // Validate each release record
+      const v = Object.assign(value, {
+        data: (value.data as unknown[]).map((record) => ReleaseSchema.parse(record))
+      });
+
+      return v as T;
     } else if (key.startsWith(CacheService.STARGAZERS_PREFIX)) {
       if (ageMs > CACHE_TTL.STARGAZERS) return null;
-      Object.assign(value, { data: value.data.map((record: object) => StargazerSchema.parse(record)) });
+      const v = Object.assign(value, {
+        data: (value.data as unknown[]).map((record) => StargazerSchema.parse(record))
+      });
+
+      return v as T;
     }
 
-    return value;
+    return value as T;
   }
 
   async set<T>(key: string, value: T): Promise<void> {

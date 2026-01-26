@@ -2,7 +2,7 @@
 author: OpenCode
 date: 2026-01-25
 type: technical
-status: proposed
+status: approved
 code: 04-type-safety-improvements
 ---
 

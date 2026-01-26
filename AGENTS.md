@@ -51,6 +51,8 @@ yarn verify           # Run lint + build (CI verification)
 cd libs/core && npm run build    # Manually rebuild core library
 ```
 
+> **Critical**: Core lib files CANNOT be changed!
+
 ## Code Style Guidelines
 
 ### Formatting (Biome Configuration)

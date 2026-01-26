@@ -4,9 +4,11 @@ import { IconFaceIdError, IconShieldLock } from '@tabler/icons-react';
 /**
  *  RepositoryError component
  */
-// biome-ignore lint/suspicious/noExplicitAny: Accept any error type
-const RepositoryError = function RepositoryError(props: { error: any }) {
-  if (props.error?.status === 401) {
+type KnownError = { status?: number; message?: string } & Record<string, unknown>;
+
+const RepositoryError = function RepositoryError(props: { error: unknown }) {
+  const err = props.error as KnownError | undefined;
+  if (err?.status === 401) {
     return (
       <div className="flex w-full h-1/2 items-center justify-center max-sm:px-4">
         <Alert
@@ -33,7 +35,7 @@ const RepositoryError = function RepositoryError(props: { error: any }) {
     );
   }
 
-  const message = props.error?.message ?? 'An unexpected error occurred.';
+  const message = err?.message ?? 'An unexpected error occurred.';
 
   return (
     <div className="flex w-full h-full items-center justify-center">
