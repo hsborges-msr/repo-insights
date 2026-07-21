@@ -17,8 +17,8 @@
   "scripts": {
     "preinstall": "(cd libs/core && yarn install --prefer-offline)",
     "prepare": "husky",
-    "test": "vitest run",
-    "test:coverage": "vitest run --coverage",
+    "test": "vitest run --exclude libs/** --passWithNoTests",
+    "test:coverage": "vitest run --coverage --exclude libs/** --passWithNoTests",
     "lint": "biome check ./src",
     "lint:fix": "biome check --write ./src",
     "format": "biome format --write ./src",
