@@ -1,264 +1,45 @@
 # Agent Guidelines for Repo Insights
 
-This document provides essential information for AI coding agents working in this repository.
+Next.js 16 / React 19 app (TypeScript, ESM-only) for visualizing GitHub repo insights. Uses Biome, Vitest, HeroUI + Tailwind v4, SWR, Zustand, Zod.
 
-## Project Overview
+## Non-obvious essentials
 
-A Next.js 16 application for visualizing GitHub repository insights and trends. Uses TypeScript, React 19, Biome for linting/formatting, Vitest for testing, and includes a git submodule for the core library at `libs/core`.
+- **Package manager is Yarn, not npm.** `"type": "module"` (ESM only), Node >= 20.
+- **`libs/core` is a git submodule and is READ-ONLY — never edit files there.** It's `@gittrends-app/core`, imported via the `@/core` alias. If missing: `git submodule update --init --recursive`.
+  - `preinstall` installs core's deps; `prebuild` runs `cd libs/core && npm run build` before every `next build`. To rebuild manually: `cd libs/core && npm run build` (there is **no** `yarn build:core` script despite what README says).
+- **Path aliases:** `@/*` → `src/*`, `@/core` → `libs/core/src`.
+- **No standalone typecheck script.** Type errors surface via `next build`. `yarn verify` = `run-s lint build` (lint → build), used for CI.
+- **Lint only covers `./src`** (`biome check ./src`), not `libs/core`.
 
-## Build, Lint, and Test Commands
-
-### Development
-
-```bash
-yarn dev              # Start Next.js development server (port 3000)
-yarn build            # Build for production (automatically builds core library)
-yarn start            # Start production server
-```
-
-### Testing
+## Commands
 
 ```bash
-yarn test             # Run all tests with Vitest
-yarn test:coverage    # Run tests with coverage report
+yarn dev              # dev server (port 3000)
+yarn build            # prod build (rebuilds core first via prebuild)
+yarn test             # vitest run
+yarn lint / lint:fix  # biome check ./src [--write]
+yarn format           # biome format --write ./src
+yarn verify           # lint + build (CI gate)
 ```
 
-To run a **single test file**:
+- Single test: `npx vitest run path/to/file.spec.ts` (watch: `npx vitest path/to/file.spec.ts`).
+- **There is no vitest config and no tests under `src/`.** The only specs live in `libs/core/src/**/*.spec.ts` (read-only), so `yarn test` currently exercises core only.
 
-```bash
-npx vitest run path/to/file.spec.ts
-# Example: npx vitest run libs/core/src/helpers/sanitize.spec.ts
-```
+## Git hooks (husky) — commits are gated
 
-To run tests in **watch mode**:
+- `pre-commit`: runs `lint` + `test`. `pre-push`: runs `verify`. `commit-msg`: commitlint.
+- **Conventional Commits required.** Allowed types include the standard set plus `ticket`. Example: `feat: add repository comparison`.
 
-```bash
-npx vitest path/to/file.spec.ts
-```
+## Conventions (enforced by Biome — see `biome.json`)
 
-### Code Quality
+- `noExplicitAny` and `noConsole` are **errors**; `noUnusedImports` is a warn. Use `// biome-ignore lint/suspicious/noExplicitAny: <reason>` only when unavoidable.
+- Single quotes (JS/TS), double quotes in JSX, semicolons always, no trailing commas, 2-space indent, 120 cols, always arrow parens. Imports auto-organized by Biome.
+- React components: PascalCase filename, default export. Utilities: camelCase filename.
 
-```bash
-yarn lint             # Lint code with Biome
-yarn lint:fix         # Lint and auto-fix issues
-yarn format           # Format code with Biome
-yarn verify           # Run lint + build (CI verification)
-```
+## Layout (`src/`)
 
-### Core Library
+`app/` (App Router pages + `api/`; dynamic route `r/[owner]/[name]`), `entities/`, `helpers/` (`cache/` IndexedDB via idb-keyval, `env/` Zod-validated env, `github/` service creators), `hooks/`, `providers/`, `constants/`, `types/`.
 
-```bash
-cd libs/core && npm run build    # Manually rebuild core library
-```
+## Planning workflow
 
-> **Critical**: Core lib files CANNOT be changed!
-
-## Code Style Guidelines
-
-### Formatting (Biome Configuration)
-
-- **Indentation**: 2 spaces
-- **Line width**: 120 characters
-- **Line endings**: LF (Unix)
-- **Quotes**: Single quotes for JS/TS, double quotes for JSX
-- **Semicolons**: Always required
-- **Trailing commas**: Never
-- **Arrow parentheses**: Always use parentheses `(x) => x`
-
-### Import Organization
-
-Imports should be organized and auto-sorted by Biome. Order:
-
-1. External dependencies (React, Next.js, third-party)
-2. Internal aliases (`@/` paths)
-3. Relative imports
-
-Example:
-
-```typescript
-import { Button } from '@heroui/react';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { Cache, GithubService } from '@/core';
-import { createService } from '@/helpers/github/base';
-```
-
-### TypeScript Guidelines
-
-- **Target**: ESNext with ES2022 lib
-- **Module**: ESNext with node resolution
-- **Strict mode**: Enabled (inherited from @tsconfig/node20)
-- **Path aliases**:
-  - `@/*` maps to `src/*`
-  - `@/core` maps to `libs/core/src`
-
-### Type Safety Rules
-
-- **No `any`**: Explicit `any` types are errors (`noExplicitAny: "error"`)
-- Use `// biome-ignore lint/suspicious/noExplicitAny: <reason>` when absolutely necessary
-- **No console**: Console statements are errors in production code
-- Use type imports when appropriate (though `useImportType` is disabled)
-- Avoid non-null assertions unless certain (rule is disabled)
-
-### Naming Conventions
-
-- **Files**: Use PascalCase for React components (`SignInButton.tsx`), camelCase for utilities (`sanitize.ts`)
-- **Components**: PascalCase with default exports
-- **Functions**: camelCase
-- **Types/Interfaces**: PascalCase
-- **Constants**: UPPER_SNAKE_CASE for env vars, camelCase for regular constants
-
-### React/Next.js Patterns
-
-- Use `'use client'` directive for client components (not needed in `app/` route files)
-- Prefer functional components with hooks
-- Use Next.js 16 App Router conventions
-- Component documentation with JSDoc:
-
-  ```typescript
-  /**
-   *  ComponentName description
-   */
-  export default function ComponentName() {
-  ```
-
-### Error Handling
-
-- Use Zod schemas for runtime validation (see `src/helpers/env/browser.ts`)
-- Parse environment variables with Zod at module load
-- Handle API errors gracefully with appropriate user feedback
-- Use TypeScript's type system to prevent errors at compile time
-
-### State Management
-
-- React hooks (`useState`, `useEffect`, etc.) for local state
-- Zustand for global state
-- SWR for data fetching and caching
-- Custom cache implementation using IndexedDB (see `src/helpers/cache/browser.ts`)
-
-### Styling
-
-- Tailwind CSS with HeroUI component library
-- Use `twMerge` for merging Tailwind classes
-- Responsive design with mobile-first approach (`max-sm:` breakpoints)
-
-### Testing
-
-- Use Vitest as the test runner
-- Test files: `*.spec.ts` or `*.test.ts`
-- Place tests adjacent to source files in `libs/core`
-- Use descriptive test names: `it('should remove null values at root', () => ...)`
-
-### Commit Message Convention
-
-Follow Conventional Commits with these allowed types:
-
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation changes
-- `style`: Code style changes (formatting, etc.)
-- `refactor`: Code refactoring
-- `perf`: Performance improvements
-- `test`: Test additions or updates
-- `chore`: Build process or auxiliary tool changes
-- `ci`: CI configuration changes
-- `ticket`: Ticket-related changes
-- `revert`: Revert previous changes
-
-Example: `feat: add repository comparison feature`
-
-## File Structure
-
-```txt
-src/
-├── app/                    # Next.js App Router pages and API routes
-│   ├── components/        # Shared React components
-│   ├── r/[owner]/[name]/ # Dynamic repository route
-│   ├── api/              # API routes
-│   ├── layout.tsx        # Root layout
-│   └── page.tsx          # Home page
-├── entities/              # Type definitions and data models
-├── helpers/               # Utility functions
-│   ├── cache/            # Caching implementations
-│   ├── env/              # Environment variable handling
-│   └── github/           # GitHub API service creators
-├── hooks/                 # Custom React hooks
-└── providers/             # React context providers
-
-libs/core/                 # Git submodule - GitHub API client library
-```
-
-## Important Notes
-
-- **Node version**: >= 20.0.0 required
-- **Package manager**: Use Yarn (not npm)
-- **Module system**: ESM only (`"type": "module"`)
-- **Core library**: Automatically installed via preinstall hook, builds before main build
-- **Git submodules**: Run `git submodule update --init --recursive` if missing
-- **Accessibility**: Click event rules disabled for JSX (`useKeyWithClickEvents: "off"`)
-- **Dependencies**: Check exhaustive deps disabled for performance in some cases
-
-## Key Dependencies
-
-- **Framework**: Next.js 16.1.1, React 19.2.3
-- **UI**: HeroUI 2.8.7, Tailwind CSS 4.1.18, Framer Motion
-- **Data**: SWR, Zustand, Zod 4.2.1
-- **GitHub**: Custom client in @gittrends-app/core
-- **Testing**: Vitest 4.0.16
-- **Tooling**: Biome 2.3.10, TypeScript 5.8.2
-
-## Maintaining This Document
-
-This document serves as the primary reference for AI coding agents working in this repository. Keeping it up-to-date ensures consistent code quality and efficient collaboration.
-
-### When to Update AGENTS.md
-
-Update this document when any of the following changes occur:
-
-1. **Build System Changes**
-   - New scripts added to `package.json`
-   - Changes to build, test, or lint commands
-   - Modifications to the development workflow
-
-2. **Configuration Updates**
-   - Changes to Biome, TypeScript, or other tool configurations
-   - Updates to formatting rules or code style preferences
-   - Modifications to linting rules or severity levels
-
-3. **Dependency Updates**
-   - Major or minor version updates to key dependencies (Next.js, React, etc.)
-   - Addition or removal of significant libraries
-   - Changes to the tech stack or architectural decisions
-
-4. **Code Standards Evolution**
-   - New coding patterns or best practices adopted
-   - Changes to naming conventions
-   - Updates to project structure or file organization
-   - New testing patterns or requirements
-
-5. **Project Structure Changes**
-   - Addition or removal of major directories
-   - Refactoring of the folder structure
-   - Changes to import path aliases
-
-6. **Workflow Changes**
-   - Updates to commit message conventions
-   - Changes to branching strategy or git workflow
-   - New development or deployment processes
-
-7. **Environment Changes**
-   - Node version requirements
-   - New environment variables or configuration files
-   - Changes to tooling or editor requirements
-
-### Update Guidelines
-
-- Keep descriptions concise and actionable
-- Include examples where helpful
-- Update version numbers when dependencies change
-- Remove outdated information promptly
-- Verify all commands and examples work correctly
-
----
-
-**Last Updated**: January 24, 2026
+When the user asks for a *plan*, follow `.opencode/rules/plan-documentation.rule.md`: produce RFCs in `docs/RFCs/`, ADRs in `docs/ADRs/` (only after RFC approval), and tasks in `docs/tasks/<code>/` before writing any code.
