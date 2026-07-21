@@ -19,6 +19,10 @@ function decompress<T>(value: string): T {
   return JSON.parse(lzString.decompressFromBase64(value));
 }
 
+function isCacheKeyFor(key: string, prefix: string): boolean {
+  return key.startsWith(`${prefix}:`) || key.includes(`:${prefix}:`);
+}
+
 /**
  * Browser cache
  */
@@ -51,11 +55,11 @@ export class BrowserCache implements Cache {
     // Global upper bound: if older than USER TTL, drop it
     if (ageMs > CACHE_TTL.USER) return null;
 
-    if (key.startsWith(CacheService.REPOSITORY_PREFIX)) {
+    if (isCacheKeyFor(key, CacheService.REPOSITORY_PREFIX)) {
       // Repository-specific TTL is shorter
       if (ageMs > CACHE_TTL.REPOSITORY) return null;
       return RepositorySchema.parse(value) as unknown as T;
-    } else if (key.startsWith(CacheService.RELEASES_PREFIX)) {
+    } else if (isCacheKeyFor(key, CacheService.RELEASES_PREFIX)) {
       if (ageMs > CACHE_TTL.STARGAZERS) return null;
       // Validate each release record
       const v = Object.assign(value, {
@@ -63,7 +67,7 @@ export class BrowserCache implements Cache {
       });
 
       return v as T;
-    } else if (key.startsWith(CacheService.STARGAZERS_PREFIX)) {
+    } else if (isCacheKeyFor(key, CacheService.STARGAZERS_PREFIX)) {
       if (ageMs > CACHE_TTL.STARGAZERS) return null;
       const v = Object.assign(value, {
         data: (value.data as unknown[]).map((record) => StargazerSchema.parse(record))
