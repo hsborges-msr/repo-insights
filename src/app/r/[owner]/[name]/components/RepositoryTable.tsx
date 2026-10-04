@@ -24,7 +24,7 @@ import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { useBoolean } from 'react-use';
 import { DATE_FORMATS, PAGINATION } from '@/constants';
-import { Actor, User } from '@/core';
+import { Actor } from '@/entities/Actor';
 import { ActorInfo } from '@/entities/ActorInfo';
 import IntlNumberFormat from '@/helpers/intl/number';
 import { SocialPlatforms } from '@/helpers/social';
@@ -163,8 +163,7 @@ export default function RepositoryTable({ actors }: { actors: ActorInfo[] }) {
         </TableColumn>
       </TableHeader>
       <TableBody emptyContent="No stargazers found" loadingContent={<Spinner label="Loading..." />}>
-        {items.map((item) => {
-          const user = item as User;
+        {items.map((user) => {
           return (
             <TableRow key={user.id}>
               <TableCell>
@@ -177,7 +176,7 @@ export default function RepositoryTable({ actors }: { actors: ActorInfo[] }) {
                 </div>
               </TableCell>
               <TableCell>
-                {Object.entries(countBy(item.events, 'type')).map(([event, count]) => (
+                {Object.entries(countBy(user.events, 'type')).map(([event, count]) => (
                   <div key={event} className="text-xs">
                     {event}: {count}
                   </div>

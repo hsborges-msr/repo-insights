@@ -3,7 +3,11 @@
 import { clear, createStore, del, get, set, UseStore } from 'idb-keyval';
 import lzString from 'lz-string';
 import { CACHE_TTL } from '@/constants';
-import { Cache, CacheService, ReleaseSchema, RepositorySchema, StargazerSchema } from '@/core';
+import { ReleaseSchema } from '@/entities/Release';
+import { RepositorySchema } from '@/entities/Repository';
+import { StargazerSchema } from '@/entities/Stargazer';
+import { WatcherSchema } from '@/entities/Watcher';
+import { Cache, CacheService } from '@/helpers/github/cache';
 
 /**
  *  Compress data
@@ -20,7 +24,7 @@ function decompress<T>(value: string): T {
 }
 
 function isCacheKeyFor(key: string, prefix: string): boolean {
-  return key.startsWith(`${prefix}:`) || key.includes(`:${prefix}:`);
+  return key.startsWith(`${prefix}:`);
 }
 
 /**
@@ -71,6 +75,13 @@ export class BrowserCache implements Cache {
       if (ageMs > CACHE_TTL.STARGAZERS) return null;
       const v = Object.assign(value, {
         data: (value.data as unknown[]).map((record) => StargazerSchema.parse(record))
+      });
+
+      return v as T;
+    } else if (isCacheKeyFor(key, CacheService.WATCHERS_PREFIX)) {
+      if (ageMs > CACHE_TTL.STARGAZERS) return null;
+      const v = Object.assign(value, {
+        data: (value.data as unknown[]).map((record) => WatcherSchema.parse(record))
       });
 
       return v as T;

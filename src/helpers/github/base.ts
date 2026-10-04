@@ -2,7 +2,9 @@ import retry from 'fetch-retry';
 import pLimit from 'p-limit';
 import { Constructor } from 'type-fest';
 import { API_CONFIG } from '@/constants';
-import { BufferedService, Cache, CacheService, GithubClient, GithubService, Service } from '@/core';
+import { Cache, CacheService } from './cache';
+import { GithubClient } from './client';
+import { GithubService } from './service';
 
 /**
  *
@@ -32,28 +34,7 @@ const fetcher = limiter(
 export function createService(namespace?: string, token?: string): GithubService;
 export function createService(namespace?: string, token?: string, Cache?: Constructor<Cache>): CacheService;
 export function createService(namespace: string = 'public', token?: string, Cache?: Constructor<Cache>) {
-  const client = new GithubClient('https://api.github.com', { apiToken: token, fetcher });
+  const service = new GithubService(new GithubClient('https://api.github.com', { token, fetcher }));
 
-  const baseService = new GithubService(client, {
-    fields: {
-      actors: {
-        name: true,
-        email: true,
-        company: true,
-        location: true,
-        created_at: true,
-        followers_count: true,
-        following_count: true,
-        social_accounts: true,
-        is_hireable: true,
-        is_github_star: true,
-        is_campus_expert: true
-      },
-      repositories: false
-    }
-  });
-
-  return Cache
-    ? (new BufferedService(new CacheService(baseService, new Cache(namespace.toLowerCase())), 2) as Service)
-    : baseService;
+  return Cache ? new CacheService(service, new Cache(namespace.toLowerCase())) : service;
 }

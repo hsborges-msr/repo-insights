@@ -1,6 +1,7 @@
-import { CacheService, GithubService } from '@/core';
 import { BrowserCache } from '../cache/browser';
 import { createService as create } from './base';
+import { CacheService } from './cache';
+import { GithubService } from './service';
 
 /**
  *  Create a browser service

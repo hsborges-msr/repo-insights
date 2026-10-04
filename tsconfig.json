@@ -6,10 +6,9 @@
     "moduleResolution": "bundler",
     "lib": ["es2022", "dom"],
     "baseUrl": "./",
-    "rootDirs": ["src", ".next", "libs/core"],
+    "rootDirs": ["src", ".next"],
     "paths": {
-      "@/*": ["src/*"],
-      "@/core": ["libs/core/src"]
+      "@/*": ["src/*"]
     },
     "jsx": "preserve",
     "allowJs": true,
@@ -19,7 +18,6 @@
     "isolatedModules": true,
     "plugins": [{ "name": "next" }]
   },
-  "references": [{ "path": "./libs/core" }],
-  "include": ["src/**/*", "libs/core/src/**/*", ".next/types/**/*.ts", "hero.ts"],
+  "include": ["src/**/*", ".next/types/**/*.ts", "hero.ts"],
   "exclude": ["node_modules", "**/*.spec.ts", "**/*.test.ts"]
 }

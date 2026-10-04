@@ -15,21 +15,18 @@
     "registry": "https://registry.npmjs.org"
   },
   "scripts": {
-    "preinstall": "(cd libs/core && yarn install --prefer-offline)",
     "prepare": "husky",
-    "test": "vitest run --exclude libs/** --passWithNoTests",
-    "test:coverage": "vitest run --coverage --exclude libs/** --passWithNoTests",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "lint": "biome check ./src",
     "lint:fix": "biome check --write ./src",
     "format": "biome format --write ./src",
     "verify": "run-s lint build",
     "dev": "next dev",
-    "prebuild": "(cd libs/core && yarn build)",
     "build": "next build",
     "start": "next start"
   },
   "dependencies": {
-    "@gittrends-app/core": "file:libs/core",
     "@heroui/react": "2.8.7",
     "@next/third-parties": "16.2.10",
     "@react-spectrum/provider": "^3.11.1",

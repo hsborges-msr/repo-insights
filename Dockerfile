@@ -5,7 +5,6 @@ WORKDIR /app
 
 # Copy package files for dependency installation
 COPY package.json yarn.lock* ./
-COPY libs/core/package.json ./libs/core/
 
 # Install all dependencies (needed for build)
 RUN yarn install --frozen-lockfile
@@ -17,7 +16,6 @@ WORKDIR /app
 
 # Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/libs ./libs
 
 # Copy source code
 COPY . .
@@ -27,7 +25,7 @@ ARG NEXT_PUBLIC_BASE_URL
 ARG NEXT_PUBLIC_GA_ID
 ARG NEXT_PUBLIC_GH_CLIENT_ID
 
-# Build the application (includes build:core and build:next)
+# Build the application
 RUN yarn build
 
 # Stage 3: Production runtime

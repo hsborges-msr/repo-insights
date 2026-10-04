@@ -14,7 +14,8 @@ import groupBy from 'lodash-es/groupBy';
 import mapValues from 'lodash-es/mapValues';
 import { useEffect, useMemo, useState } from 'react';
 import { useBoolean } from 'react-use';
-import { Release, Stargazer } from '@/core';
+import { Release } from '@/entities/Release';
+import { Stargazer } from '@/entities/Stargazer';
 
 dayjs.extend(utcTime);
 dayjs.extend(customParseFormat);

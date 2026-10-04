@@ -5,17 +5,16 @@ Next.js 16 / React 19 app (TypeScript, ESM-only) for visualizing GitHub repo ins
 ## Non-obvious essentials
 
 - **Package manager is Yarn, not npm.** `"type": "module"` (ESM only), Node >= 20.
-- **`libs/core` is a git submodule and is READ-ONLY — never edit files there.** It's `@gittrends-app/core`, imported via the `@/core` alias. If missing: `git submodule update --init --recursive`.
-  - `preinstall` installs core's deps; `prebuild` runs `cd libs/core && npm run build` before every `next build`. To rebuild manually: `cd libs/core && npm run build` (there is **no** `yarn build:core` script despite what README says).
-- **Path aliases:** `@/*` → `src/*`, `@/core` → `libs/core/src`.
+- **GitHub data layer lives in `src/helpers/github/`** (incorporated from the former `@gittrends-app/core` submodule, trimmed to what the app uses): `client.ts` (fetch-based GraphQL client, drops `null`s from responses), `queries.ts` (static GraphQL documents), `service.ts` (`GithubService`: viewer, repository, stargazers/releases/watchers pagination with page-size halving on 5xx), `cache.ts` (`CacheService` decorator). Entities are Zod schemas in `src/entities/`.
+- **Path alias:** `@/*` → `src/*` (also mirrored in `vitest.config.ts`).
 - **No standalone typecheck script.** Type errors surface via `next build`. `yarn verify` = `run-s lint build` (lint → build), used for CI.
-- **Lint only covers `./src`** (`biome check ./src`), not `libs/core`.
+- **Lint only covers `./src`** (`biome check ./src`).
 
 ## Commands
 
 ```bash
 yarn dev              # dev server (port 3000)
-yarn build            # prod build (rebuilds core first via prebuild)
+yarn build            # prod build
 yarn test             # vitest run
 yarn lint / lint:fix  # biome check ./src [--write]
 yarn format           # biome format --write ./src
@@ -23,7 +22,7 @@ yarn verify           # lint + build (CI gate)
 ```
 
 - Single test: `npx vitest run path/to/file.spec.ts` (watch: `npx vitest path/to/file.spec.ts`).
-- **There is no vitest config and no tests under `src/`.** The only specs live in `libs/core/src/**/*.spec.ts` (read-only), so `yarn test` currently exercises core only.
+- Specs live next to the code as `*.spec.ts` (e.g. `src/helpers/github/*.spec.ts`); they are excluded from the Next.js typecheck via `tsconfig.json`.
 
 ## Git hooks (husky) — commits are gated
 

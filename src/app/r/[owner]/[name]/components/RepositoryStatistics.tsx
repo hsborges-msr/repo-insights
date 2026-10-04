@@ -7,7 +7,6 @@ const ReactECharts = lazy(() => import('echarts-for-react'));
 import countBy from 'lodash-es/countBy';
 import orderBy from 'lodash-es/orderBy';
 import { useMemo } from 'react';
-import { User } from '@/core';
 import { ActorInfo } from '@/entities/ActorInfo';
 import IntlNumberFormat from '@/helpers/intl/number';
 import { SocialPlatforms } from '@/helpers/social';
@@ -29,9 +28,9 @@ function FollowersFollowingChart({ actors, className }: { actors: ActorInfo[]; c
             dimensions: ['followers', 'following'],
             source: actors.map((s) => {
               return {
-                user: (s as User).login,
-                followers: (s as User).followers_count,
-                following: (s as User).following_count
+                user: s.login,
+                followers: s.followers_count,
+                following: s.following_count
               };
             })
           },
@@ -81,7 +80,7 @@ function FollowersFollowingChart({ actors, className }: { actors: ActorInfo[]; c
 function AccountAgeChart({ actors, className }: { actors: ActorInfo[]; className?: string }) {
   const grouped = useMemo(
     () =>
-      Object.entries(countBy(actors, (s) => dayjs(Date.now()).diff((s as User).created_at, 'year') + 1)).map(
+      Object.entries(countBy(actors, (s) => dayjs(Date.now()).diff(s.created_at, 'year') + 1)).map(
         ([age, count], index) => ({ age: index === 0 ? `<${age}` : age, count })
       ),
     [actors]
@@ -136,7 +135,7 @@ function AvailabilityChart({ actors, className }: { actors: ActorInfo[]; classNa
         Object.keys(SocialPlatforms)
           .map((key) => ({
             key,
-            count: actors.filter((s) => (s as User).social_accounts?.[key]).length || 0
+            count: actors.filter((s) => s.social_accounts?.[key]).length || 0
           }))
           .filter((s) => s.count > 0),
         'count',

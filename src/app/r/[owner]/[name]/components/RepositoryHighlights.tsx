@@ -4,7 +4,6 @@ import localizedFormat from 'dayjs/plugin/localizedFormat';
 import orderBy from 'lodash-es/orderBy';
 import { useMemo } from 'react';
 import { DATE_FORMATS } from '@/constants';
-import { User } from '@/core';
 import { ActorInfo } from '@/entities/ActorInfo';
 import IntlNumberFormat from '@/helpers/intl/number';
 
@@ -64,10 +63,7 @@ function Highlights(data: {
  */
 export default function RepositoryHighlights({ actors }: { actors: ActorInfo[] }) {
   const sorted = useMemo(
-    () =>
-      orderBy(actors, 'created_at', 'asc').sort(
-        (a, b) => ((b as User).email?.length ? 1 : 0) - ((a as User).email?.length ? 1 : 0)
-      ),
+    () => orderBy(actors, 'created_at', 'asc').sort((a, b) => (b.email?.length ? 1 : 0) - (a.email?.length ? 1 : 0)),
     [actors]
   );
 
@@ -90,27 +86,27 @@ export default function RepositoryHighlights({ actors }: { actors: ActorInfo[] }
       <Highlights
         title="Most followers"
         actors={orderBy(actors, 'followers_count', 'desc').slice(0, 5)}
-        description={(actor) => `${IntlNumberFormat((actor as User).followers_count)} followers`}
+        description={(actor) => `${IntlNumberFormat(actor.followers_count)} followers`}
       />
-      {sorted.some((s) => (s as User).is_github_star) && (
+      {sorted.some((s) => s.is_github_star) && (
         <Highlights
           title="Github Star"
-          actors={sorted.filter((s) => (s as User).is_github_star)}
-          description={(actor) => (actor as User).name}
+          actors={sorted.filter((s) => s.is_github_star)}
+          description={(actor) => actor.name}
         />
       )}
-      {sorted.some((s) => (s as User).is_campus_expert) && (
+      {sorted.some((s) => s.is_campus_expert) && (
         <Highlights
           title="Campus Experts"
-          actors={sorted.filter((s) => (s as User).is_campus_expert)}
-          description={(actor) => (actor as User).name}
+          actors={sorted.filter((s) => s.is_campus_expert)}
+          description={(actor) => actor.name}
         />
       )}
-      {sorted.some((s) => (s as User).is_hireable) && (
+      {sorted.some((s) => s.is_hireable) && (
         <Highlights
           title="Hireable users"
-          actors={sorted.filter((s) => (s as User).is_hireable)}
-          description={(actor) => `Email: ${(actor as User).email}`}
+          actors={sorted.filter((s) => s.is_hireable)}
+          description={(actor) => `Email: ${actor.email}`}
         />
       )}
     </div>

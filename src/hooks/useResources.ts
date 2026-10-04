@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useBoolean } from 'react-use';
 import { AsyncState } from 'react-use/lib/useAsyncFn';
-import { Release, RepositoryNode, Stargazer, Watcher } from '@/core';
+import { Release } from '@/entities/Release';
+import { Stargazer } from '@/entities/Stargazer';
+import { Watcher } from '@/entities/Watcher';
 import { createService } from '@/helpers/github/browser';
+import { Resource, ResourceIterable, ResourceMap } from '@/helpers/github/service';
 import useAuth from './useAuth';
 import useRepository from './useRepository';
 
@@ -11,8 +14,6 @@ export type IterableAsyncState<T> = AsyncState<T[]> & {
   hasMore: boolean;
   cached: boolean;
 };
-
-type Resource = 'stargazers' | 'releases' | 'watchers';
 
 export default function useResources(
   owner: string,
@@ -46,7 +47,7 @@ export default function useResources(
  * @param resource Resource type to fetch ('stargazers' | 'releases' | 'watchers')
  * @param paused When true, the hook will not start fetching
  */
-export default function useResources<T extends RepositoryNode>(
+export default function useResources<T extends ResourceMap[Resource]>(
   owner: string,
   name: string,
   resource: Resource,
@@ -71,28 +72,11 @@ export default function useResources<T extends RepositoryNode>(
       .then(async () => {
         if (paused || !repo) return;
 
-        // Explicitly request a cached service and narrow the resource to call the
-        // appropriate overload. We cast via `unknown` to `Iterable<T>` to keep
-        // the implementation generic while preserving the public overloads above.
-        type ElementMeta = { cursor?: string; has_more: boolean; [k: string]: unknown };
-        let it: AsyncIterable<{ data: T[]; metadata: ElementMeta; __cached?: boolean }>;
-
-        if (resource === 'stargazers') {
-          it = createService(repo.name_with_owner, user?.__access_token, true).resources('stargazers', {
-            repository: repo.id,
-            cursor: data.cursor || undefined
-          }) as unknown as AsyncIterable<{ data: T[]; metadata: ElementMeta; __cached?: boolean }>;
-        } else if (resource === 'releases') {
-          it = createService(repo.name_with_owner, user?.__access_token, true).resources('releases', {
-            repository: repo.id,
-            cursor: data.cursor || undefined
-          }) as unknown as AsyncIterable<{ data: T[]; metadata: ElementMeta; __cached?: boolean }>;
-        } else {
-          it = createService(repo.name_with_owner, user?.__access_token, true).resources('watchers', {
-            repository: repo.id,
-            cursor: data.cursor || undefined
-          }) as unknown as AsyncIterable<{ data: T[]; metadata: ElementMeta; __cached?: boolean }>;
-        }
+        // The public overloads above tie `T` to `resource`
+        const it = createService(repo.name_with_owner, user?.__access_token, true).resources(resource, {
+          repository: repo.id,
+          cursor: data.cursor || undefined
+        }) as ResourceIterable<T>;
 
         let iteration = 0;
         const cache: T[] = [...data.records];

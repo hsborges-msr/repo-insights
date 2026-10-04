@@ -13,7 +13,7 @@ import {
 } from '@tabler/icons-react';
 import { useMemo } from 'react';
 import { twMerge } from 'tailwind-merge';
-import { Repository, User } from '@/core';
+import { Repository } from '@/entities/Repository';
 import IntlNumberFormat from '@/helpers/intl/number';
 
 /**
@@ -41,16 +41,16 @@ export function RepositoryHeader({ repo, className }: { repo: Repository; classN
   return (
     <div className={twMerge('flex max-sm:flex-col items-center justify-center gap-1', className)}>
       <div className="flex items-center justify-center gap-1">
-        <Avatar src={(repo.owner as User).avatar_url} alt={repo.description} className="w-20 h-20" />
+        <Avatar src={repo.owner.avatar_url} alt={repo.description} className="w-20 h-20" />
         <div className="flex flex-col font-extrabold">
           <Link
             className="text-xl text-gray-500"
-            href={`https://github.com/${(repo.owner as User).login}`}
+            href={`https://github.com/${repo.owner.login}`}
             isExternal
             color="foreground"
             disableAnimation
           >
-            {(repo.owner as User).login}
+            {repo.owner.login}
           </Link>
           <Link
             className="text-3xl mt-[-.25em]"

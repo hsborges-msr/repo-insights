@@ -4,7 +4,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { createContext, useEffect, useMemo, useRef } from 'react';
 import { createStore, StoreApi, useStore } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { Actor } from '@/core';
+import { Actor } from '@/entities/Actor';
 import { createService } from '@/helpers/github/browser';
 
 type UserProfile = {
