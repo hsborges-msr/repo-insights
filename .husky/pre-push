@@ -1,1 +1,6 @@
+# Placeholder public env so `next build` can validate src/helpers/env/browser.ts.
+# Scoped to this check only: real deployments must provide their own values.
+NEXT_PUBLIC_BASE_URL=http://localhost:3000 \
+NEXT_PUBLIC_GA_ID= \
+NEXT_PUBLIC_GH_CLIENT_ID= \
 npm run verify
